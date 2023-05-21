@@ -1,0 +1,5 @@
+make
+./parser < tests/test.txt
+./parser < tests/test1.txt
+./parser < tests/test2.txt
+./parser < tests/test3.txt
