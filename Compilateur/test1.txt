@@ -1,0 +1,17 @@
+
+int max(int a, int b){
+if (a>b) {
+	print(a);
+			}
+
+
+else {
+	print(b);}
+			}
+int main() {
+   int a = 10;
+   int b = 5;
+   
+	max(a,b);
+   return 0;
+}
