@@ -1,24 +1,19 @@
-LEX=flex
-YACC=bison
-CC=gcc
-CFLAGS=-Wall
+CC = gcc
+CFLAGS = -Wall
 
-.PHONY: all clean check
 
-all: parser
-
-parser: lex.yy.c parser.tab.c main.c
-	$(CC) $(CFLAGS) $^ -o $@
+compilateur: lex.yy.c parser.tab.c
+	$(CC) $(CFLAGS) -o compilateur lex.yy.c parser.tab.c
 
 lex.yy.c: lex.l
-	$(LEX) $<
+	flex lex.l
 
 parser.tab.c: parser.y
-	$(YACC) -d $<
+	bison -d parser.y
 
-check: parser test1.txt
-	./parser < test1.txt
+test_tab_symboles: tab_symboles/table_symboles.c tab_symboles/test.c
+	$(CC) $(CFLAGS) -o test_tab_symboles tab_symboles/table_symboles.c tab_symboles/test.c && ./test_tab_symboles
 
 clean:
-	rm -f parser lex.yy.c parser.tab.c parser.tab.h
+	rm -f lex.yy.c parser.tab.c parser.tab.h compilateur table_symboles.o test.o test_tab_symboles
 

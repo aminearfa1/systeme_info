@@ -189,3 +189,9 @@ SuiteInitTab : tCOMA E SuiteInitTab
 void yyerror(const char *msg) {
 fprintf(stderr, "Erreur de syntaxe : %s\n", msg);
 }
+
+int main() {
+
+	yyparse();
+	return 0;
+}
