@@ -1,6 +1,15 @@
-make test_tab_symboles //pour testez table de symbole
+//pour testez table de symbole
 
+make test_tab_symboles 
+make clean
+
+make 
 make compilateur, 
 ./compilateur < tests/test.txt 
 ./compilateur < tests/test1.txt 
 ./compilateur < tests/test2.txt 
+
+
+//testez table_instruction 
+make test_tab_instructions.
+make clean

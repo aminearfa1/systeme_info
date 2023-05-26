@@ -10,10 +10,14 @@ lex.yy.c: lex.l
 
 parser.tab.c: parser.y
 	bison -d parser.y
+	
+test_tab_instructions: tab_instructions/tab_instruction.c tab_instructions/test.c
+	$(CC) $(CFLAGS) -o test_tab_instructions tab_instructions/tab_instruction.c tab_instructions/test.c && ./test_tab_instructions && cat asm.txt
+
 
 test_tab_symboles: tab_symboles/table_symboles.c tab_symboles/test.c
 	$(CC) $(CFLAGS) -o test_tab_symboles tab_symboles/table_symboles.c tab_symboles/test.c && ./test_tab_symboles
 
 clean:
-	rm -f lex.yy.c parser.tab.c parser.tab.h compilateur table_symboles.o test.o test_tab_symboles
+	rm -f lex.yy.c parser.tab.c parser.tab.h compilateur table_symboles.o test.o test_tab_symboles test_tab_instructions output.txt asm.txt
 

@@ -134,12 +134,11 @@ While : tWHILE tOBRACE E tCBRACE Body
       ;
 
 Aff : tID tEQ E tPV
-    { printf("Symbol assignment\n"); }
     ;
 
 
 
-E : tNB 	  { printf("Number\n"); }
+E : tNB 	  
    | tNBEXP   { printf("Exponential number\n"); }
    | E tMUL E { printf("Multiplication\n"); }
    | E tDIV E { printf("Division\n"); }
