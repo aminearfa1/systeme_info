@@ -1,0 +1,11 @@
+# Fichiers générés par la compilation
+lex.yy.c
+parser.tab.c
+parser.tab.h
+table_symboles.o
+test.o
+test_tab_symboles
+test_tab_instructions
+output.txt
+asm.txt
+
