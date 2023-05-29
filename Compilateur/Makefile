@@ -3,7 +3,7 @@ CFLAGS = -Wall
 
 
 compilateur: lex.yy.c parser.tab.c
-	$(CC) $(CFLAGS) -o compilateur lex.yy.c parser.tab.c
+	$(CC) $(CFLAGS) -o compilateur lex.yy.c parser.tab.c tab_instructions/tab_instruction.c tab_symboles/table_symboles.c 
 
 lex.yy.c: lex.l
 	flex lex.l
@@ -19,5 +19,5 @@ test_tab_symboles: tab_symboles/table_symboles.c tab_symboles/test.c
 	$(CC) $(CFLAGS) -o test_tab_symboles tab_symboles/table_symboles.c tab_symboles/test.c && ./test_tab_symboles
 
 clean:
-	rm -f lex.yy.c parser.tab.c parser.tab.h compilateur table_symboles.o test.o test_tab_symboles test_tab_instructions output.txt asm.txt
+	rm -f lex.yy.c parser.tab.c parser.tab.h  table_symboles.o test.o test_tab_symboles test_tab_instructions output.txt asm.txt
 

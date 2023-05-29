@@ -1,4 +1,7 @@
 %{
+#include "tab_symboles/table_symboles.h"
+#include "tab_instructions/tab_instruction.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -50,7 +53,7 @@ extern int yylex();
 
 
 %%
-Program : Functions  { printf("début du programme\n"); };
+Program : Functions  { printf("début du programme\n");  print(); create_asm();};
 
 Main: tINT tMAIN tOBRACE Args tCBRACE Body  { printf("Main principal\n"); };
 
@@ -190,7 +193,7 @@ fprintf(stderr, "Erreur de syntaxe : %s\n", msg);
 }
 
 int main() {
-
+	init();
 	yyparse();
 	return 0;
 }
