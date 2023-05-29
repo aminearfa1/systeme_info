@@ -11,6 +11,9 @@ struct type_t type_courant;
 
 extern int yylex();
 
+// Tableau pour le management des patchs des JMP
+int instructions_ligne_to_patch[10][20];
+int nbs_instructions_to_patch[10];
 %}
 
 %union {
@@ -18,6 +21,9 @@ extern int yylex();
     char id[30];
     char str[300];
 }
+
+
+
 %define parse.error verbose
 
 // Récupération des tokens
@@ -91,6 +97,7 @@ Body : tOBRACKET Instructions tCBRACKET
      { printf("Function body\n"); }
      ;
 
+
 Instructions : Instruction Instructions
              |
              ;
@@ -118,21 +125,48 @@ Param : E
 SuiteParams : tCOMA Param SuiteParams {};
 SuiteParams :
             ;
+/*************************************/
 
-If : tIF tOBRACE E tCBRACE Body Else
-   { printf("If statement\n"); }
-   ;
+// Un if : le token, une expression entre parenthèses suivie d'un body et d'un else
+If : tIF tOBRACE E tCBRACE {
+	printf("If statement\n");
+    add_operation(JMF, $3, 0, 0);  
+    $1 = get_current_index() - 1;  
+}
 
-Else : tELSE If
-     { printf("Else if statement\n"); }
-     | tELSE Body
-     { printf("Else statement\n"); }
-     |
-     ;
+Body {
+    int current = get_current_index();  
+    patch($1, current + 1);  
+    add_operation(JMP, 0, 0, 0);  
+    instructions_ligne_to_patch[get_prof()][nbs_instructions_to_patch[get_prof()]] = current; 
+    nbs_instructions_to_patch[get_prof()]++;
+
+}
+Else;
+
+Else : tELSE Body {
+	printf("Else statement\n");
+    int current = get_current_index();
+    for (int i = 0; i < nbs_instructions_to_patch[get_prof()]; i++) {
+        patch(instructions_ligne_to_patch[get_prof()][i], current);  
+    }
+    nbs_instructions_to_patch[get_prof()] = 0;
+};
+
+Else :  {
+    int current = get_current_index();
+    for (int i = 0; i < nbs_instructions_to_patch[get_prof()]; i++) {
+        patch(instructions_ligne_to_patch[get_prof()][i], current); 
+    }
+    nbs_instructions_to_patch[get_prof()] = 0;
+};
+
+/*************************************/
 
 While : tWHILE tOBRACE E tCBRACE Body
       { printf("While loop\n"); }
       ;
+/*************************************/
 
 
 Aff : tID tEQ E tPV { printf("%s prend une valeur\n", $1); struct symbole_t * symbole  = get_variable($1); symbole->initialized = 1; add_operation(COP, symbole->adresse, $3,0);} ; //besoin de get_address
