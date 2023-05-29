@@ -22,6 +22,24 @@ def interpreter(machine_code_file):
                 operand2_address = int(machine_code[20:], 2)
                 memory[result_address] = memory[operand1_address] + memory[operand2_address]
 
+            elif opcode == "0010":  # MUL
+                result_address = int(machine_code[4:12], 2)
+                operand1_address = int(machine_code[12:20], 2)
+                operand2_address = int(machine_code[20:], 2)
+                memory[result_address] = memory[operand1_address] * memory[operand2_address]
+
+            elif opcode == "0011":  # SOU
+                result_address = int(machine_code[4:12], 2)
+                operand1_address = int(machine_code[12:20], 2)
+                operand2_address = int(machine_code[20:], 2)
+                memory[result_address] = memory[operand1_address] - memory[operand2_address]
+
+            elif opcode == "0100":  # DIV
+                result_address = int(machine_code[4:12], 2)
+                operand1_address = int(machine_code[12:20], 2)
+                operand2_address = int(machine_code[20:], 2)
+                memory[result_address] = memory[operand1_address] // memory[operand2_address]
+
             elif opcode == "0101":  # COP
                 result_address = int(machine_code[4:12], 2)
                 operand_address = int(machine_code[12:20], 2)

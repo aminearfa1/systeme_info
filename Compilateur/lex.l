@@ -1,70 +1,69 @@
-%{
+%{ // Ne pas toucher
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include "parser.tab.h"
-
 %}
-
 %option noyywrap
 %option noinput
 %option nounput
 
-%{
-// Define token types
+%%
 
-%}
+
+"main"      { return tMAIN;     }    // Token de la fonction main
+
+"{"         { return tOBRACKET; }    // Token accolade ouvrante
+"}"         { return tCBRACKET; }    // Token accolade fermante
+"("		    	{ return tOBRACE;   }    // Token parenthèse ouvrante
+")"	    		{ return tCBRACE;   }    // Token parenthèse fermante
+
+"const"     { return tCONST;    }    // Token constante
+"int"       { return tINT;      }    // Token type int
+
+"if"        { return tIF;       }    // Token if
+"else"      { return tELSE;     }    // Token else
+"while"     { return tWHILE;    }    // Token while
+
+"return"    {return tRETURN;    }    // Token return
+
+"<"         { return tLT;       }    // Token plus petit que
+">"         { return tGT;       }    // Token plus grand que
+"=="        { return tEQCOND;   }    // Token égal comparaison
+
+"!"         { return tNOT;      }    // Token NOT 
+"&&"        { return tAND;      }    // Token ET
+"||"        { return tOR;       }    // Token OU
+
+"&"         { return tADDR;     }    // Token adresse
+"["         { return tOCROCH;   }    // Token crochet ouvrante
+"]" 		    { return tCCROCH;   }    // Token crochet ouvrante
+
+"get"       { return tGET;      }    // Token fonction get
+"print"     { return tPRINT;    }    // Token fonction print
+"stop"      { return tSTOP;     }    // Token fonction stop
+
+"+"			    { return tADD;      }    // Token addition
+"-"		    	{ return tSUB;      }    // Token soustraction
+"*"         { return tMUL;      }    // Token multiplication
+"/"         { return tDIV;      }    // Token division
+
+"="         { return tEQ;       }    // Token egal affectation
+
+";"			    { return tPV;       }
+","         { return tCOMA;     }
+
+[0-9]+	        { yylval.nombre = atoi(yytext); return tNB; }    // Token nombre au format classique
+[0-9]+e[0-9]+ 	{ yylval.nombre = -1; return tNB;        }       // Token nombre au format exponentiel
+
+["][^"]*["]     { strcpy(yylval.str, yytext); return tSTR; }
+
+[a-zA-Z][a-zA-Z0-9_]* { strcpy(yylval.id, yytext); return tID; } // Chaine de caractère (identifiant variable, fonction..)
+
+
+" "			    {} //Ne pas les retourner à Yacc (espace)
+"   "       {} //Ne pas les retourner à Yacc (tabulation)
+"\n"        {} //Ne pas les retourner à Yacc (retour chariot)
 
 %%
 
-"int"           { return tINT;}
-"const"           { return tCONST;}
-"main"          { return tMAIN;}
-
-"if"            { return tIF;}
-"else"          { return tELSE;}
-"while"         { return tWHILE; }
-
-"print"         { return tPRINT; }
-"get"           { return tGET; }
-"stop"          { return tSTOP; }
-
-"return"        { return tRETURN; }
-
-"=="            { return tEQCOND;};
-"<"             { return tLT; }
-">"             { return tGT; }
-
-"="             { return tEQ; }
-"&&"            { return tAND; }
-"||"            { return tOR; }
-"!"             { return tNOT; }
-"&"             { return tADDR; }
-
-"+"             { return tADD; }
-"-"             { return tSUB; }
-"*"             { return tMUL; }
-"/"             { return tDIV; }
-
-"{"             { return tOBRACKET; }
-"}"             { return tCBRACKET; }
-"("             { return tOBRACE; }
-")"             { return tCBRACE; }
-"["             { return tOCROCH; }
-"]"             { return tCCROCH; }
-";"             { return tPV ; }
-","             { return tCOMA; }
-
-"//".*          { /* ignore comments */ }
-"/*"([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+"/" { /* ignorer le commentaire */ }
-
-[0-9]+          { yylval.numval = atoi(yytext); printf("tNB: '%d[%#x]'\n", yylval.numval, yylval.numval);return tNB;}
-
-0[xX][0-9a-fA-F]+    { yylval.numval = strtol(yytext, NULL, 16); printf("tNB: '%d[0x%x]'\n", yylval.numval, yylval.numval);return tNB;}
-
-[a-zA-Z][a-zA-Z0-9]* { yylval.strval = strdup(yytext); printf("tID: '%s'\n", yylval.strval); return tID;}
-                
-[ \t\n\r]       { /* ignore whitespace */ }
-
-
-%%

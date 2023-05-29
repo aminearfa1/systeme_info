@@ -6,9 +6,9 @@ int main() {
     init();
 
     // Ajout de symboles
-    push("var1", 1, INT);
-    push("var2", 0, INT);
-    push("var3", 1, INT);
+    push("var1", 1, integer);
+    push("var2", 0, integer);
+    push("var3", 1, integer);
 
     // Affichage de la table des symboles
     printf("Table des symboles après l'ajout initial :\n");

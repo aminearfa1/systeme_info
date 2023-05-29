@@ -1,4 +1,4 @@
 int main(){
-    int a = 2+3*4/5;
-    printf(a);
+    int a = 5 - 2 + 2 * 2 +1 + 3;
+     print(a);
 }

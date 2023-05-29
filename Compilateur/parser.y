@@ -6,36 +6,39 @@
 #include <stdlib.h>
 #include <string.h>
 
+void yyerror(const char *msg);
+struct type_t type_courant;
 
-void yyerror(const char *);
 extern int yylex();
 
 %}
-%union {
-    char* strval;
-    int numval;
-}
 
+%union {
+	int nombre;
+    char id[30];
+    char str[300];
+}
 %define parse.error verbose
+
 // Récupération des tokens
 %token tMAIN
 %token tOBRACKET tCBRACKET
-%token tOBRACE tCBRACE
+%token<nombre> tOBRACE tCBRACE
 %token tOCROCH tCCROCH
 %token tINT
 %token tCONST
 %token tPV tCOMA
 %token tMUL tDIV tADD tSUB tEQ
-%token <numval>  tNB tNBEXP
-%token <strval> tID
+%token<nombre> tNB tNBEXP
+%token<id> tID
 %token tSTR
 %token tPRINT tGET tSTOP
-%token tIF tELSE
+%token<nombre> tIF tELSE
 %token tWHILE
 %token tRETURN
 %token tLT tGT tEQCOND
 %token tAND tOR
-%token tADDR
+%token tADDR 
 
 %left tLT tGT
 %left tEQCOND
@@ -45,11 +48,7 @@ extern int yylex();
 %left tMUL tDIV
 
 %right tINT tMAIN
-
-
-
-
-
+%type<nombre> E Invocation
 
 
 %%
@@ -65,16 +64,17 @@ Fonction : Type tID tOBRACE Args tCBRACE Body
          { printf("Function declaration: %s\n", $2); }
          ;
 
-Get : tGET tOBRACE tCBRACE { printf("Get statement\n"); };
 
-Print : tPRINT tOBRACE E tCBRACE 
+Print : tPRINT tOBRACE E tCBRACE  {add_operation(PRI,$3,0,0);                                      // On ajoute l'instruction PRI
 
-Print : tPRINT tOBRACE tSTR tCBRACE 
+                                  };
 
-Stop : tSTOP tOBRACE tNB tCBRACE { printf("Stop statement\n"); };
 
-Return : tRETURN E tPV { printf("Return statement\n"); };
+// Stop, une fonction particulière
+Stop : tSTOP tOBRACE tNB tCBRACE  {};
 
+// Return, etape clé d'une fonction
+Return : tRETURN E tPV          {};
 
 Args : Arg ArgSuite
      |
@@ -103,22 +103,20 @@ Instruction : Aff           { printf("Assignment\n"); }
             | Return          
             | Stop tPV            { printf("Stop statement\n"); }
             | Print tPV            { printf("Print statement\n"); }
-            | Get tPV            { printf("Get statement\n"); }
             ;
 
 Invocation : tID tOBRACE Params tCBRACE
            { printf("Function invocation: %s\n", $1); }
            ;
-
+Params: {};
 Params : Param SuiteParams
-       |
        ;
 
 Param : E
       ;
 
-SuiteParams : tCOMA Param SuiteParams
-            |
+SuiteParams : tCOMA Param SuiteParams {};
+SuiteParams :
             ;
 
 If : tIF tOBRACE E tCBRACE Body Else
@@ -136,43 +134,144 @@ While : tWHILE tOBRACE E tCBRACE Body
       { printf("While loop\n"); }
       ;
 
-Aff : tID tEQ E tPV
-    ;
+
+Aff : tID tEQ E tPV { printf("%s prend une valeur\n", $1); struct symbole_t * symbole  = get_variable($1); symbole->initialized = 1; add_operation(COP, symbole->adresse, $3,0);} ; //besoin de get_address
+
+E : tNB                                  {
+  int addr = push("TEMP_V", 1, integer );
+  add_operation(AFC, addr,$1,0);
+  $$ = addr;
+};
+
+E : tNBEXP                               {
+  int addr = push("TEMP_V", 1, integer ); 
+  add_operation(AFC, addr,$1,0); 
+  $$ = addr;
+};
+
+E : E tMUL E                             {
+  add_operation(MUL,$1,$1,$3);
+  $$ = $1;
+  pop();
+};
+
+E : E tDIV E                             {
+  add_operation(DIV, $1,$1,$3); 
+  $$ = $1; 
+  pop();
+};
 
 
+E : E tSUB E                             {
+  add_operation(SOU,$1,$1,$3); 
+  $$ = $1; 
+  pop();
+};
 
-E : tNB 	  
-   | tNBEXP   { printf("Exponential number\n"); }
-   | E tMUL E { printf("Multiplication\n"); }
-   | E tDIV E { printf("Division\n"); }
-   | E tSUB E { printf("Subtraction\n"); }
-   | E tADD E { printf("Addition\n"); }
-   | Invocation	
-   | tOBRACE E tCBRACE	{ printf("Parenthesized expression\n"); }
-   | tSUB E	{ printf("Unary minus\n"); }
-   | E tEQCOND E	{ printf("Conditional expression\n"); }
-   | E tGT E	{ printf("Greater than\n"); }
-   | E tLT E	{ printf("Less than\n"); }
-   | tNOT E	{ printf("Logical negation\n"); }
-   | E tAND E	{ printf("Logical AND\n"); }
-   | E tOR E	{ printf("Logical OR\n"); }
-   | tMUL E	{ printf("Dereference\n"); }
-   | tID	{ printf("Identifier\n"); }
-   | tID tOCROCH E tCCROCH	{ printf("Array indexing\n"); }
-;
+E : E tADD E                             {
+  add_operation(ADD,$1,$1,$3); 
+  $$ = $1; 
+  pop();
+};
 
-Type : tINT
-| Type tMUL
-| tCONST Type
+E : Invocation                           {
+  $$ = $1;
+};
+
+E : tOBRACE E tCBRACE                    {
+  $$ = $2;
+};
+
+E : tSUB E                               {
+  int addr = push("TEMP_V", 1, integer );
+  add_operation(AFC, addr,0,0);
+  add_operation(SOU, $2, addr, $2);
+  $$ = $2;
+  pop();
+};
+
+E : E tEQCOND E                          {
+  add_operation(EQU,$1,$1,$3);
+  $$ = $1;
+  pop();
+};
+
+E : E tGT E                              {
+  add_operation(SUP,$1,$1,$3); 
+  $$ = $1; 
+  pop();
+};
+
+E : E tLT E                              {
+  add_operation(INF,$1,$1,$3); 
+  $$ = $1; 
+  pop();
+};
+
+E : tNOT E                               {
+  int addr = push("TEMP_V", 1, integer );
+  add_operation(AFC, addr,0,0);
+  add_operation(EQU, $2, addr, $2);
+  $$ = $2;
+  pop();
+};
+
+E : E tAND E                             {
+  add_operation(MUL,$1,$1,$3); 
+  $$ = $1; 
+  pop();
+};
+
+E : E tOR E                              {
+  add_operation(ADD,$1,$1,$3); 
+  $$ = $1; 
+  pop();
+};
+
+E : tMUL E                               {
+  add_operation(READ, $2, $2, 0);
+  $$=$2;
+};
+
+
+E : tID                                  {struct symbole_t * symbole  = get_variable($1);         
+                                          struct type_t type = symbole->type;                      
+                                          type.nb_blocs = 1; 
+                                          int addr = push("0_TEMPORARY", 1, type);                
+                                          if (symbole->type.isTab == 1) {
+                                            add_operation(AFCA, addr,symbole->adresse,0);         
+                                          } else {
+                                            add_operation(COP, addr,symbole->adresse,0);           
+                                          } 
+                                          $$ = addr;
+                                  		  pop(); 
+
+                                         };
+
+Type : tINT                              {type_courant.base = INT; 
+                                          type_courant.pointeur_level = 0;
+																					type_courant.isConst = 0;
+                                         };
+
+Type :  tCONST Type;
 ;
 
 Decl : Type UneDecl FinDecl 
 ;
 
-UneDecl : tID
-| tID tEQ E 
-| tID tOCROCH tNB tCCROCH { printf("Array declaration\n"); }
-| tID tOCROCH tNB tCCROCH tEQ tOBRACKET InitTab tCBRACKET { printf("Array declaration with initialization\n"); }
+UneDecl : tID                            {type_courant.isTab = 0;                                  // On est pas un tableau
+                                          type_courant.nb_blocs = 1;                              // On fixe le nombre de blocs
+                                          push($1, 0, type_courant);
+                                         };
+                                         
+// Une déclaration d'une simple variable avec initialisation
+UneDecl : tID tEQ E                      {pop();                                                  
+                                          type_courant.isTab = 0;                                 
+                                          type_courant.nb_blocs = 1;                                                        
+                                          push($1,1, type_courant);                     
+                                         }; 
+UneDecl : tID tOCROCH tNB tCCROCH { printf("Array declaration\n"); };
+UneDecl : tID tOCROCH tNB tCCROCH tEQ tOBRACKET InitTab tCBRACKET { printf("Array declaration with initialization\n"); }
 ;
 
 FinDecl : tPV
@@ -189,11 +288,12 @@ SuiteInitTab : tCOMA E SuiteInitTab
 %%
 
 void yyerror(const char *msg) {
-fprintf(stderr, "Erreur de syntaxe : %s\n", msg);
+    fprintf(stderr, "Erreur de syntaxe : %s\n", msg);
 }
 
 int main() {
-	init();
-	yyparse();
-	return 0;
+    init();
+    yyparse();
+    return 0;
 }
+

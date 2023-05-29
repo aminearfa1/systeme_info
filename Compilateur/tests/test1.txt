@@ -1,17 +1,10 @@
-
-int max(int a, int b){
-if (a>b) {
-	print(a);
-			}
-
-
-else {
-	print(b);}
-			}
-int main() {
-   int a = 10;
-   int b = 5;
-   
-	max(a,b);
-   return 0;
+int main(){
+    int a = 2+3;
+    int b = 3-1;
+    int c = 10*2;
+    int d = 10/2; 
+    print(a);
+    print(b);
+    print(c);
+    print(d);
 }
