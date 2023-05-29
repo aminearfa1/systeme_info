@@ -44,7 +44,7 @@ def cross_assembler(input_file, output_file):
                 machine_code = translate_instruction(opcode, args)
                 f_out.write(machine_code + "\n")
 
-input_file = "asm.txt"
-output_file = "machine_code.txt"
+input_file = "/home/arfa/Bureau/systeme_info/Compilateur/Interpreteur/asm.txt"
+output_file = "/home/arfa/Bureau/systeme_info/Compilateur/Interpreteur/machine_code.txt"
 cross_assembler(input_file, output_file)
 

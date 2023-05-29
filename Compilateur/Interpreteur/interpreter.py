@@ -86,7 +86,7 @@ def interpreter(machine_code_file):
 
             pc += 1  # Passe à l'instruction suivante
 
-machine_code_file = "machine_code.txt"
+machine_code_file = "/home/arfa/Bureau/systeme_info/Compilateur/Interpreteur/machine_code.txt"
 interpreter(machine_code_file)
 
 

@@ -1,0 +1,12 @@
+int main(){
+    int a = 2;
+    int c = 10*2;
+    if (a==2){
+    	print(a);
+    	}
+    else {
+    int d=5;
+    	print(c);
+    	}
+
+}

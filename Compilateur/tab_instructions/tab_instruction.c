@@ -101,13 +101,22 @@ char * get_asm_line_from_op(struct operation_t op) {
 
 // Génère le code asm dans un fichier
 void create_asm() {
-	FILE * output = fopen("asm.txt", "w");
-	for (int i = 0; i < current_index; i++) {
-		char * line = get_asm_line_from_op(tab_op[i]);
-		fputs(line, output);
-		free(line);
-	}
+    char *filename = "/home/arfa/Bureau/systeme_info/Compilateur/Interpreteur/asm.txt";
+    FILE *output = fopen(filename, "w");
+    if (output == NULL) {
+        printf("Impossible d'ouvrir le fichier %s\n", filename);
+        return;
+    }
+    
+    for (int i = 0; i < current_index; i++) {
+        char *line = get_asm_line_from_op(tab_op[i]);
+        fputs(line, output);
+        free(line);
+    }
+    
+    fclose(output);
 }
+
 
 // Renvoie l'index courant dans le tableau
 int get_current_index() {

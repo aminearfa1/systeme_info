@@ -17,6 +17,28 @@ test_tab_instructions: tab_instructions/tab_instruction.c tab_instructions/test.
 test_tab_symboles: tab_symboles/table_symboles.c tab_symboles/test.c
 	$(CC) $(CFLAGS) -o test_tab_symboles tab_symboles/table_symboles.c tab_symboles/test.c && ./test_tab_symboles
 
+
+test_arith0:
+	./compilateur < tests/arith0.txt 
+	 python Interpreteur/cross_assembler.py 
+	python Interpreteur/interpreter.py
+
+test_arith1:
+	./compilateur < tests/arith1.txt 
+	 python Interpreteur/cross_assembler.py 
+	python Interpreteur/interpreter.py
+
+test_if:
+	./compilateur < tests/if.txt 
+	 python Interpreteur/cross_assembler.py 
+	python Interpreteur/interpreter.py
+
+test_else:
+	./compilateur < tests/else.txt 
+	 python Interpreteur/cross_assembler.py 
+	python Interpreteur/interpreter.py
+
+
 clean:
 	rm -f lex.yy.c parser.tab.c parser.tab.h  table_symboles.o test.o test_tab_symboles test_tab_instructions output.txt asm.txt
 
