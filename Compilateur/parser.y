@@ -38,7 +38,7 @@ int nbs_instructions_to_patch[10];
 %token<nombre> tNB tNBEXP
 %token<id> tID
 %token tSTR
-%token tPRINT tGET tSTOP
+%token tPRINT 
 %token<nombre> tIF tELSE
 %token tWHILE
 %token tRETURN
@@ -76,9 +76,6 @@ Print : tPRINT tOBRACE E tCBRACE  {add_operation(PRI,$3,0,0);                   
                                   };
 
 
-// Stop, une fonction particulière
-Stop : tSTOP tOBRACE tNB tCBRACE  {};
-
 // Return, etape clé d'une fonction
 Return : tRETURN E tPV          {};
 
@@ -108,7 +105,6 @@ Instruction : Aff           { printf("Assignment\n"); }
             | If           
             | While            { printf("While loop\n"); }
             | Return          
-            | Stop tPV            { printf("Stop statement\n"); }
             | Print tPV            { printf("Print statement\n"); }
             ;
 
@@ -262,10 +258,9 @@ E : E tOR E                              {
   pop();
 };
 
-E : tMUL E                               {
-  add_operation(READ, $2, $2, 0);
-  $$=$2;
-};
+E : tMUL E                               {add_operation(READ, $2, $2, 0);                          // Extraction en mémoire
+                                          $$=$2;
+                                         };
 
 
 E : tID                                  {struct symbole_t * symbole  = get_variable($1);         

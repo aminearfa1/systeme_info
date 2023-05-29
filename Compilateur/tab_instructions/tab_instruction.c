@@ -74,27 +74,9 @@ char * get_asm_line_from_op(struct operation_t op) {
 		case (PRI):
 			sprintf(buffer, "PRI %d\n", op.arg1);
 			break;
-        case (PRIC):
-			sprintf(buffer, "PRIC %d\n", op.arg1);
-			break;
 		case (READ):
-			sprintf(buffer, "READ %d %d\n", op.arg1, op.arg2);
-			break;
-		case (WR):
-			sprintf(buffer, "WR %d %d\n", op.arg1, op.arg2);
-			break;
-		case (CALL):
-			sprintf(buffer, "CALL %d %d\n", op.arg1, op.arg2);
-			break;
-		case (RET):
-			sprintf(buffer, "RET\n");
-			break;
-        case (GET):
-            sprintf(buffer, "GET %d\n", op.arg1);
-            break;
-        case (STOP):
-            sprintf(buffer, "STOP %d\n", op.arg1);
-            break;
+			sprintf(buffer,"READ %d %d\n",op.arg1, op.arg2);
+			break;	
 	}
 	return buffer;
 }

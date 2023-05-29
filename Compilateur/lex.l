@@ -39,9 +39,9 @@
 "["         { return tOCROCH;   }    // Token crochet ouvrante
 "]" 		    { return tCCROCH;   }    // Token crochet ouvrante
 
-"get"       { return tGET;      }    // Token fonction get
+
 "print"     { return tPRINT;    }    // Token fonction print
-"stop"      { return tSTOP;     }    // Token fonction stop
+
 
 "+"			    { return tADD;      }    // Token addition
 "-"		    	{ return tSUB;      }    // Token soustraction

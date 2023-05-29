@@ -7,7 +7,7 @@
 
 // Liste de codes des instructions
 enum opcode_t {
-	ADD, MUL, SOU, DIV, COP, AFC, AFCA, JMP, JMF, INF, SUP, EQU, PRI, PRIC, READ, WR, CALL, RET, GET, STOP
+	ADD, MUL, SOU, DIV, COP, AFC, AFCA, JMP, JMF, INF, SUP, EQU, PRI, READ
 };
 
 // Ajoute une opération dans la table (à la fin)
