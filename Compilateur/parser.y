@@ -1,7 +1,21 @@
+%code requires {
+	
+	struct while_t {
+		int n_ins_cond;
+		int n_ins_jmf;
+	};
+}
+
+%union {
+	int nombre;
+    char id[30];
+    char str[300];
+	struct while_t m_while;
+}
 %{
+
 #include "tab_symboles/table_symboles.h"
 #include "tab_instructions/tab_instruction.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,15 +26,10 @@ struct type_t type_courant;
 extern int yylex();
 
 // Tableau pour le management des patchs des JMP
-int instructions_ligne_to_patch[10][20];
-int nbs_instructions_to_patch[10];
+int ligne_instructions_to_patch[10][20];
+int instructions_nb[10];
 %}
 
-%union {
-	int nombre;
-    char id[30];
-    char str[300];
-}
 
 
 
@@ -40,7 +49,7 @@ int nbs_instructions_to_patch[10];
 %token tSTR
 %token tPRINT 
 %token<nombre> tIF tELSE
-%token tWHILE
+%token<m_while> tWHILE
 %token tRETURN
 %token tLT tGT tEQCOND
 %token tAND tOR
@@ -58,7 +67,7 @@ int nbs_instructions_to_patch[10];
 
 
 %%
-Program : Functions  { printf("début du programme\n");  print(); create_asm();};
+Program : Functions  { printf("début du programme\n");    print();    create_asm();};
 
 Main: tINT tMAIN tOBRACE Args tCBRACE Body  { printf("Main principal\n"); };
 
@@ -134,8 +143,8 @@ Body {
     int current = get_current_index();  
     patch($1, current + 1);  
     add_operation(JMP, 0, 0, 0);  
-    instructions_ligne_to_patch[get_prof()][nbs_instructions_to_patch[get_prof()]] = current; 
-    nbs_instructions_to_patch[get_prof()]++;
+    ligne_instructions_to_patch[get_prof()][instructions_nb[get_prof()]] = current; 
+    instructions_nb[get_prof()]++;
 
 }
 Else;
@@ -143,25 +152,40 @@ Else;
 Else : tELSE Body {
 	printf("Else statement\n");
     int current = get_current_index();
-    for (int i = 0; i < nbs_instructions_to_patch[get_prof()]; i++) {
-        patch(instructions_ligne_to_patch[get_prof()][i], current);  
+    for (int i = 0; i < instructions_nb[get_prof()]; i++) {
+        patch(ligne_instructions_to_patch[get_prof()][i], current);  
     }
-    nbs_instructions_to_patch[get_prof()] = 0;
+    instructions_nb[get_prof()] = 0;
 };
 
 Else :  {
     int current = get_current_index();
-    for (int i = 0; i < nbs_instructions_to_patch[get_prof()]; i++) {
-        patch(instructions_ligne_to_patch[get_prof()][i], current); 
+    for (int i = 0; i < instructions_nb[get_prof()]; i++) {
+        patch(ligne_instructions_to_patch[get_prof()][i], current); 
     }
-    nbs_instructions_to_patch[get_prof()] = 0;
+    instructions_nb[get_prof()] = 0;
 };
 
 /*************************************/
 
-While : tWHILE tOBRACE E tCBRACE Body
-      { printf("While loop\n"); }
-      ;
+While : tWHILE {
+
+            $1.n_ins_cond = get_current_index(); // On enregistre l'endroit de la condition (pour le JMP en fin de while)
+          }
+          tOBRACE E tCBRACE {
+
+            add_operation(JMF, $4, 0, 0); // Ecriture du JMF
+            $1.n_ins_jmf = get_current_index() - 1; // Enregistrement du numero d'instruction du jmf à patch
+
+
+          }
+          Body {
+
+            int current = get_current_index(); // Patch du JMF après le body
+            patch($1.n_ins_jmf, current + 1);
+            add_operation(JMP, $1.n_ins_cond, 0, 0); // JMP au debut de la boucle
+          };
+
 /*************************************/
 
 
@@ -229,13 +253,14 @@ E : E tEQCOND E                          {
 E : E tGT E                              {
   add_operation(SUP,$1,$1,$3); 
   $$ = $1; 
-  pop();
+
 };
 
 E : E tLT E                              {
+	printf("condition détecter\n");
   add_operation(INF,$1,$1,$3); 
   $$ = $1; 
-  pop();
+
 };
 
 E : tNOT E                               {
@@ -323,6 +348,7 @@ void yyerror(const char *msg) {
 int main() {
     init();
     yyparse();
+
     return 0;
 }
 
