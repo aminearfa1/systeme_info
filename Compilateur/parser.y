@@ -63,7 +63,7 @@ int instructions_nb[10];
 %left tMUL tDIV
 
 %right tINT tMAIN
-%type<nombre> E Invocation
+%type<nombre> E 
 
 
 %%
@@ -110,26 +110,14 @@ Instructions : Instruction Instructions
 
 Instruction : Aff           { printf("Assignment\n"); }
             | Decl            { printf("Variable declaration\n"); }
-            | Invocation tPV 
             | If           
             | While            { printf("While loop\n"); }
             | Return          
             | Print tPV            { printf("Print statement\n"); }
             ;
 
-Invocation : tID tOBRACE Params tCBRACE
-           { printf("Function invocation: %s\n", $1); }
-           ;
-Params: {};
-Params : Param SuiteParams
-       ;
 
-Param : E
-      ;
 
-SuiteParams : tCOMA Param SuiteParams {};
-SuiteParams :
-            ;
 /*************************************/
 
 // Un if : le token, une expression entre parenthèses suivie d'un body et d'un else
@@ -228,9 +216,6 @@ E : E tADD E                             {
   pop();
 };
 
-E : Invocation                           {
-  $$ = $1;
-};
 
 E : tOBRACE E tCBRACE                    {
   $$ = $2;
@@ -307,8 +292,6 @@ Type : tINT                              {type_courant.base = INT;
 																					type_courant.isConst = 0;
                                          };
 
-Type :  tCONST Type;
-;
 
 Decl : Type UneDecl FinDecl 
 ;
@@ -322,10 +305,10 @@ UneDecl : tID                            {type_courant.isTab = 0;               
 UneDecl : tID tEQ E                      {pop();                                                  
                                           type_courant.isTab = 0;                                 
                                           type_courant.nb_blocs = 1;                                                        
-                                          push($1,1, type_courant);                     
+                                          push($1,1, type_courant);                     // On déclare la variable qui a la même adresse que la variable temporaire, et, a donc déjà la valeur
+
                                          }; 
-UneDecl : tID tOCROCH tNB tCCROCH { printf("Array declaration\n"); };
-UneDecl : tID tOCROCH tNB tCCROCH tEQ tOBRACKET InitTab tCBRACKET { printf("Array declaration with initialization\n"); }
+
 ;
 
 FinDecl : tPV
@@ -333,12 +316,7 @@ FinDecl : tPV
 |
 ;
 
-InitTab : E SuiteInitTab
-;
 
-SuiteInitTab : tCOMA E SuiteInitTab
-|
-;
 %%
 
 void yyerror(const char *msg) {
@@ -351,4 +329,3 @@ int main() {
 
     return 0;
 }
-

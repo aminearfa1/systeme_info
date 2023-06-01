@@ -1,5 +1,6 @@
+
 int main(){
-    int a = 100;
+    int a = 2;
     int c = 10;
     if (a==2){
     	print(a);

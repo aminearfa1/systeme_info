@@ -100,18 +100,16 @@ void create_asm() {
 }
 
 
-// Renvoie l'index courant dans le tableau
 int get_current_index() {
-	return current_index;
+    return current_index;
 }
 
-// Permet de modifier une instruction a posteriori (pour les JMP)
+// Permet de modifier une instruction a posteriori (pour les JMP et JMF)
 void patch(int index, int arg) {
-	if (tab_op[index].opcode == JMP) {
-		tab_op[index].arg1 = arg;
-	} else if (tab_op[index].opcode == JMF) {
-		tab_op[index].arg2 = arg;
-	}
+    if (tab_op[index].opcode == JMP) {
+        tab_op[index].arg1 = arg;
+    } else if (tab_op[index].opcode == JMF) {
+        tab_op[index].arg2 = arg;
+    }
 }
-
 

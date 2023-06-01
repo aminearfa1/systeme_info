@@ -38,7 +38,10 @@ test_else:
 	 python Interpreteur/cross_assembler.py 
 	python Interpreteur/interpreter.py
 
-
+test_while:
+	./compilateur < tests/while.txt 
+	 python Interpreteur/cross_assembler.py 
+	python Interpreteur/interpreter.py
 clean:
 	rm -f lex.yy.c parser.tab.c parser.tab.h  table_symboles.o test.o test_tab_symboles test_tab_instructions output.txt asm.txt
 

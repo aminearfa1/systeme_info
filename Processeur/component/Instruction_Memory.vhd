@@ -34,13 +34,17 @@ architecture Behavioral of Instruction_Memory is
     signal addI : STD_LOGIC_VECTOR (7 downto 0) := (others => '0');
     type dataInstructArray is array (0 to 255) of std_logic_vector(31 downto 0);
     signal DataI : dataInstructArray :=
-        (
-            0=> x"01061400", 
-            1=> x"02060800", 
-            2=> x"01061200",
-            3=> x"02050100", 
-            others => x"00000000"
-        );
+          (------- (AFC then COP) ---------
+       --0=> x"01061000", -- AFC 01 10
+       --1=> x"02060500", -- AFC 02 05
+       --2=> x"01061500", -- AFC 01 15
+       --3=> x"02050100", -- COP 04 01
+       
+       ----- (STORE then LOAD) ---------
+       0=> x"01061400", -- AFC 01 14
+       1=> x"02081500", -- STORE 02 15
+       2=> x"03070200", -- LOAD 03 02
+       others => x"00000000");
 begin
     process
     begin
